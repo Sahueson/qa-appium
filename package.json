@@ -1,0 +1,16 @@
+{
+  "name": "qa-appium",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Pruebas móviles (Chrome en Android) de Tactical Calendar con Appium + WebdriverIO",
+  "scripts": { "test": "wdio run wdio.conf.js" },
+  "devDependencies": {
+    "@wdio/cli": "^9.0.0",
+    "@wdio/local-runner": "^9.0.0",
+    "@wdio/mocha-framework": "^9.0.0",
+    "@wdio/spec-reporter": "^9.0.0",
+    "appium": "^2.0.0",
+    "appium-uiautomator2-driver": "^3.0.0",
+    "wdio-wait-for": "^3.0.0"
+  }
+}
