@@ -39,12 +39,13 @@ exports.config = {
   // SUITE llega de la web (slugs separados por comas, p. ej. a-auth); cada suite es una carpeta de tests/
   specs: (process.env.SUITE || "a-auth").split(",").filter(Boolean).map((s) => `./tests/${s}/**/*.js`),
   maxInstances: 1,
+  waitforTimeout: 10000,
   capabilities: [capability],
   // Solo para el modo Chrome. Debe ser el STAGING (los usuarios QA no existen en producción).
   baseUrl: process.env.BASE_URL || "https://tactical-calendar-demo.vercel.app",
   framework: "mocha",
-  // GREP llega de la web: regex de títulos (solo esos casos). Un reintento por test: los emuladores de CI fallan alguna vez sin motivo.
-  mochaOpts: { timeout: 90000, retries: 1, ...(process.env.GREP ? { grep: new RegExp(process.env.GREP) } : {}) },
+  // GREP llega de la web: regex de títulos (solo esos casos). RETRIES=1 reintenta cada test (útil en CI, pero engaña en tests que cambian datos).
+  mochaOpts: { timeout: 90000, retries: Number(process.env.RETRIES || 0), ...(process.env.GREP ? { grep: new RegExp(process.env.GREP) } : {}) },
   reporters: ["spec"],
 
   before: async () => {
