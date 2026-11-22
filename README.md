@@ -19,3 +19,9 @@ Requisitos: Android SDK (adb) + un AVD (por defecto `Pixel_7_API_34`), Java 17+,
 
     npm install && npx appium &      # servidor de Appium
     APK_PATH=/ruta/app-debug.apk QA_PASSWORD=... ./run.sh
+
+Notas de ejecución (verificadas en un emulador `Pixel_7`, API 37, contra el Supabase de staging):
+- Con dos emuladores abiertos, elegir uno con `UDID=emulator-5554` (`adb devices`).
+- Arrancar Appium con `npx appium --allow-insecure=uiautomator2:chromedriver_autodownload` (descarga el Chromedriver de la WebView).
+- `JAVA_HOME` debe apuntar a un JDK que exista (Appium lo usa para verificar la firma del APK).
+- El APK debe compilarse con `VITE_ENABLE_QA_LOGIN=true` y las variables de staging; la config fuerza su reinstalación (`enforceAppInstall`).

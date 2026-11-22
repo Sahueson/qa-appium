@@ -24,18 +24,18 @@ describe("Suite A · Autenticación (móvil)", () => {
     if (!process.env.QA_PASSWORD) throw new Error("Falta QA_PASSWORD");
     await login(USERS.player_mad.email, process.env.QA_PASSWORD);
     await expect($("[data-testid=qa-login-btn]")).not.toBeDisplayed();
-    await expect($(`*=${USERS.player_mad.nickname}`)).toBeDisplayed();
+    await expect($(`//*[contains(normalize-space(text()), "${USERS.player_mad.nickname}")]`)).toBeDisplayed();
   });
 
   it("TC-A02 Usuario bloqueado ve acceso denegado", async () => {
     if (!process.env.QA_PASSWORD) throw new Error("Falta QA_PASSWORD");
     await login(USERS.blocked.email, process.env.QA_PASSWORD);
-    await expect($("h1=Acceso denegado")).toBeDisplayed();
+    await expect($("h2=Acceso denegado")).toBeDisplayed();
   });
 
   it("TC-A04 Contraseña incorrecta muestra error y no entra", async () => {
     await login(USERS.player_mad.email, "contraseña-incorrecta");
-    await expect($("*=Error al iniciar sesión")).toBeDisplayed();
+    await expect($('//*[contains(normalize-space(text()), "Error al iniciar sesión")]')).toBeDisplayed();
     await expect($("[data-testid=qa-login-btn]")).toBeDisplayed();
   });
 });

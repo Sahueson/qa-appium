@@ -3,13 +3,13 @@
 //   (sin APK_PATH)                 -> Chrome móvil contra BASE_URL (la web, sin app)
 // Servicio de Appium arrancado aparte (`npx appium`). No se lanza desde la web: GitHub Actions no trae emulador.
 const fs = require("fs");
-const results = [];
+const LINES = "result.tests.ndjson"; // los workers de WebdriverIO son otro proceso: cada test se guarda en un fichero
 const APK = process.env.APK_PATH;
 const PKG = "com.tacticalcalendar.app";
 
-const device = { platformName: "Android", "appium:automationName": "UiAutomator2", "appium:deviceName": process.env.AVD_NAME || "Pixel_7_API_34", "appium:newCommandTimeout": 120 };
+const device = { platformName: "Android", "appium:automationName": "UiAutomator2", "appium:deviceName": process.env.AVD_NAME || "Pixel_7_API_34", "appium:newCommandTimeout": 120, ...(process.env.UDID ? { "appium:udid": process.env.UDID } : {}) };
 const capability = APK
-  ? { ...device, "appium:app": APK, "appium:appPackage": PKG, "appium:appActivity": `${PKG}.MainActivity`, "appium:autoWebview": true, "appium:chromedriverAutodownload": true, "appium:autoGrantPermissions": true }
+  ? { ...device, "appium:app": APK, "appium:appPackage": PKG, "appium:appActivity": `${PKG}.MainActivity`, "appium:autoWebview": true, "appium:chromedriverAutodownload": true, "appium:autoGrantPermissions": true, "appium:enforceAppInstall": true }
   : { ...device, browserName: "chrome", "appium:chromedriverAutodownload": true };
 
 exports.config = {
@@ -33,9 +33,12 @@ exports.config = {
   },
   // Cada test se anota para result.json (formato común del lab)
   afterTest: async (test, _ctx, { passed, error, duration }) => {
-    results.push({ name: test.title, status: passed ? "passed" : "failed", duration_ms: duration, role: APK ? "App Android" : "Móvil", error: error ? String(error.message).slice(0, 500) : null, evidence_url: null });
+    fs.appendFileSync(LINES, JSON.stringify({ name: test.title, status: passed ? "passed" : "failed", duration_ms: duration, role: APK ? "App Android" : "Móvil", error: error ? String(error.message).slice(0, 500) : null, evidence_url: null }) + "\n");
   },
+  onPrepare: () => { fs.rmSync(LINES, { force: true }); },
   onComplete: () => {
+    const results = fs.existsSync(LINES) ? fs.readFileSync(LINES, "utf8").trim().split("\n").filter(Boolean).map((l) => JSON.parse(l)) : [];
+    fs.rmSync(LINES, { force: true });
     const total = results.reduce((a, t) => a + t.duration_ms, 0);
     const n = (s) => results.filter((t) => t.status === s).length;
     fs.writeFileSync("result.json", JSON.stringify({
