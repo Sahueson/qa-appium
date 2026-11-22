@@ -50,7 +50,7 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - run: npm ci
+      - run: npm install --no-audit --no-fund
 
       - name: Dependencias de shared (reserva y reset del staging)
         run: npm ci --prefix shared
