@@ -3,18 +3,20 @@ const USERS = {
   player_mad: { email: "qa.player.mad@example.com", nickname: "QA Jugador MAD" },
   blocked: { email: "qa.blocked@example.com" },
 };
+// En la app (APK) no hay URL que abrir: la app ya está arrancada y se recarga su WebView. En Chrome se abre la web.
+const open = async () => { if (process.env.APK_PATH) await browser.refresh(); else await browser.url("/"); };
 const login = async (email, password) => {
-  await browser.url("/");
+  await open();
   await $("[data-testid=qa-email-input]").setValue(email);
   await $("[data-testid=qa-password-input]").setValue(password);
   await $("[data-testid=qa-login-btn]").click();
 };
 
 describe("Suite A · Autenticación (móvil)", () => {
-  beforeEach(async () => { await browser.url("/"); await browser.execute(() => { localStorage.clear(); sessionStorage.clear(); }); });
+  beforeEach(async () => { await open(); await browser.execute(() => { localStorage.clear(); sessionStorage.clear(); }); });
 
   it("TC-SMOKE La app carga y muestra el login QA", async () => {
-    await browser.url("/");
+    await open();
     await expect($("[data-testid=qa-login-btn]")).toBeDisplayed();
   });
 
