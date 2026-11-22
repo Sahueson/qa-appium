@@ -8,8 +8,8 @@ Pruebas móviles de Tactical Calendar con Appium 2 + WebdriverIO + UiAutomator2,
 
 4 casos (`TC-SMOKE`, `TC-A01`, `TC-A02`, `TC-A04`) con los mismos nombres que en Playwright.
 
-**Estado: escritas, sin ejecutar** (falta emulador/adb). GitHub Actions no trae emulador Android de serie, así que esta herramienta
-no se lanza desde la web: se ejecuta en local y se publican los resultados reales (`result.json`).
+**Estado: verificadas, también en CI.** Se lanzan desde la web: el workflow arranca un emulador Android (KVM), descarga el APK de la
+release `apk-staging`, levanta Appium y ejecuta los casos (~3 min). Para actualizar el APK: `gh release upload apk-staging app-debug.apk --clobber`.
 
 Aviso: los usuarios QA solo existen en el staging. El APK debe estar construido apuntando a Supabase de staging
 (`VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY` de staging); contra producción los casos de login fallarán.
