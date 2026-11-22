@@ -7,6 +7,6 @@ npx appium --allow-insecure=uiautomator2:chromedriver_autodownload > appium.log 
 APPIUM_PID=$!
 for i in $(seq 1 30); do curl -sf http://127.0.0.1:4723/status >/dev/null && break; sleep 1; done
 code=0
-./run.sh || code=$?
+bash ./run.sh || code=$?
 kill $APPIUM_PID 2>/dev/null || true
 exit $code
