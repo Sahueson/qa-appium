@@ -4,3 +4,8 @@ shared
 
 apk/*.apk
 result.tests.ndjson
+apk/
+appium.log
+evidence/
+report
+shared

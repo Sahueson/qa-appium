@@ -1,0 +1,109 @@
+name: run-tests
+
+# Appium (Android) contra Tactical Calendar (staging): corre dentro de la app (APK de Capacitor) en un emulador.
+# Lo lanza la web (workflow_dispatch). El APK se descarga de la release `apk-staging` de este repo.
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "ID del run en Supabase"
+        required: true
+      suite:
+        description: "Slug de la suite o varios separados por comas (ej. a-auth)"
+        required: true
+      grep:
+        description: "Opcional: solo estos tests (regex de títulos, separados por |)"
+        required: false
+        default: ""
+
+jobs:
+  test:
+    permissions:
+      contents: write   # publica el informe en la rama gh-pages
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      RUN_ID: ${{ inputs.run_id }}
+      SUITE: ${{ inputs.suite }}
+      GREP: ${{ inputs.grep }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+      STG_URL: ${{ secrets.STG_URL }}
+      STG_SECRET_KEY: ${{ secrets.STG_SECRET_KEY }}
+      QA_PASSWORD: ${{ secrets.QA_PASSWORD }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
+        with:
+          repository: Sahueson/ivan-qa-lab-shared
+          path: shared
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - run: npm ci
+
+      - name: Dependencias de shared (reserva y reset del staging)
+        run: npm ci --prefix shared
+
+      - name: Marcar run como en curso
+        run: node shared/send-to-supabase.js start
+
+      # APK de debug de la app, compilado contra el staging (release apk-staging).
+      - name: Descargar el APK
+        run: gh release download apk-staging --pattern app-debug.apk --dir apk --repo "$GITHUB_REPOSITORY"
+
+      # El emulador necesita aceleración KVM (disponible en los runners Linux de repos públicos).
+      - name: Activar KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Ejecutar tests en el emulador
+        uses: reactivecircus/android-emulator-runner@v2
+        continue-on-error: true
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_7
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -no-audio -no-boot-anim -camera-back none -camera-front none
+          script: bash ./ci-run.sh
+
+      - name: Enviar resultados
+        if: always()
+        run: node shared/publish-results.js result.json
+
+      - name: Informe HTML
+        if: always()
+        continue-on-error: true
+        run: |
+          node shared/make-report.js result.json report "Informe de Appium (app Android)"
+          node shared/mask-report.js report
+
+      - name: Publicar informe (GitHub Pages)
+        if: always() && hashFiles('report/index.html') != ''
+        continue-on-error: true
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: report
+          destination_dir: ${{ inputs.run_id }}
+          keep_files: true
+          user_name: qa-lab-bot
+          user_email: qa-lab-bot@users.noreply.github.com
+
+      - name: Marcar run como fallido
+        if: failure() || cancelled()
+        run: node shared/send-to-supabase.js fail "El job de GitHub Actions falló o se canceló"
