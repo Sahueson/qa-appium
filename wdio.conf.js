@@ -14,6 +14,7 @@ const capability = APK
 
 exports.config = {
   runner: "local",
+  autoXvfb: false, // no hace falta pantalla virtual (y en el runner de CI rompe el worker)
   hostname: process.env.APPIUM_HOST || "127.0.0.1",
   port: 4723,
   // SUITE llega de la web (slugs separados por comas, p. ej. a-auth); cada suite es una carpeta de tests/
