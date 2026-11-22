@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Informe de Appium (app Android)</title>
+<style>
+:root{color-scheme:light dark;--bg:#f6f5f1;--card:#fff;--line:#e3e1da;--txt:#171717;--mut:#6b6b66}
+@media(prefers-color-scheme:dark){:root{--bg:#121212;--card:#1c1c1c;--line:#2e2e2e;--txt:#ececec;--mut:#9a9a94}}
+body{margin:0;background:var(--bg);color:var(--txt);font:15px/1.5 system-ui,sans-serif}main{max-width:1000px;margin:0 auto;padding:32px 20px}
+h1{margin:0 0 4px;font-size:28px}p.sub{margin:0 0 24px;color:var(--mut)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:24px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}.kpi b{display:block;font-size:28px}.kpi span{color:var(--mut);font-size:12px}
+.kpi.hero{background:#111;color:#fff}.kpi.hero span{color:#bbb}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+td{padding:12px 14px;border-top:1px solid var(--line);vertical-align:top}tr:first-child td{border-top:0}td.num{text-align:right;white-space:nowrap;color:var(--mut)}
+.tag{display:inline-block;padding:2px 10px;border-radius:99px;font-size:12px;font-weight:600}
+.tag.passed{background:#10b98122;color:#059669}.tag.failed{background:#ef444422;color:#dc2626}.tag.skipped{background:#f59e0b22;color:#d97706}
+small{color:var(--mut)}details{margin-top:6px}summary{cursor:pointer;color:var(--mut);font-size:13px}
+pre{background:#0d0d0d;color:#d6d6d6;padding:12px;border-radius:12px;overflow:auto;font-size:12px;white-space:pre-wrap;word-break:break-word}pre.err{color:#fca5a5}
+img{max-width:100%;border:1px solid var(--line);border-radius:12px;margin-top:6px}.steps{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px}figure{margin:0;width:150px}figure img{width:100%;margin-top:0}figcaption{font-size:12px;color:var(--mut);margin-top:4px}
+.env{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px 18px;margin-bottom:24px}.env h2{margin:0 0 10px;font-size:15px}
+.env dl{margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 20px}.env dt{font-size:12px;color:var(--mut)}.env dd{margin:0;font-weight:600}
+footer{margin-top:24px;color:var(--mut);font-size:12px}
+</style></head><body><main>
+<h1>Informe de Appium (app Android)</h1>
+<p class="sub">Suite <strong>a-auth</strong> · tactical-calendar · 22/11/2026, 23:15:54 · 25.0 s</p>
+<section class="kpis">
+<div class="kpi hero"><b>100%</b><span>Tasa de éxito (4 de 4)</span></div>
+<div class="kpi"><b>4</b><span>Pasan</span></div>
+<div class="kpi"><b>0</b><span>Fallan</span></div>
+<div class="kpi"><b>0</b><span>Omitidos</span></div>
+</section>
+<section class="env"><h2>Entorno</h2><dl><div><dt>Dispositivo</dt><dd>sdk_gphone64_x86_64 (emulador)</dd></div><div><dt>Android</dt><dd>14</dd></div><div><dt>Modo</dt><dd>App Android (com.tacticalcalendar.app) dentro de su WebView</dd></div><div><dt>Driver</dt><dd>Appium 2 · UiAutomator2 · WebdriverIO</dd></div><div><dt>Destino</dt><dd>Staging de Tactical Calendar (nunca producción)</dd></div></dl></section>
+<table><tbody>
+<tr class="passed"><td><span class="tag passed">Pasa</span></td>
+<td><strong>TC-SMOKE La app carga y muestra el login QA</strong><br><small>App Android</small><div class="steps"><figure><a href="img/tc-smoke-la-app-carga-y-muestra-el-login-qa-1.png" target="_blank" rel="noreferrer"><img src="img/tc-smoke-la-app-carga-y-muestra-el-login-qa-1.png" alt="La app arranca y muestra el formulario de login QA" loading="lazy"></a><figcaption>1. La app arranca y muestra el formulario de login QA</figcaption></figure></div></td>
+<td class="num">1.5 s</td></tr>
+<tr class="passed"><td><span class="tag passed">Pasa</span></td>
+<td><strong>TC-A01 Jugador con equipo entra y ve la navegación completa</strong><br><small>App Android</small><div class="steps"><figure><a href="img/tc-a01-jugador-con-equipo-entra-y-ve-la-navegacion-completa-1.png" target="_blank" rel="noreferrer"><img src="img/tc-a01-jugador-con-equipo-entra-y-ve-la-navegacion-completa-1.png" alt="Credenciales escritas (la contraseña va oculta)" loading="lazy"></a><figcaption>1. Credenciales escritas (la contraseña va oculta)</figcaption></figure><figure><a href="img/tc-a01-jugador-con-equipo-entra-y-ve-la-navegacion-completa-2.png" target="_blank" rel="noreferrer"><img src="img/tc-a01-jugador-con-equipo-entra-y-ve-la-navegacion-completa-2.png" alt="Sesión iniciada: calendario con el nombre del jugador" loading="lazy"></a><figcaption>2. Sesión iniciada: calendario con el nombre del jugador</figcaption></figure></div></td>
+<td class="num">10.8 s</td></tr>
+<tr class="passed"><td><span class="tag passed">Pasa</span></td>
+<td><strong>TC-A02 Usuario bloqueado ve acceso denegado</strong><br><small>App Android</small><div class="steps"><figure><a href="img/tc-a02-usuario-bloqueado-ve-acceso-denegado-1.png" target="_blank" rel="noreferrer"><img src="img/tc-a02-usuario-bloqueado-ve-acceso-denegado-1.png" alt="Credenciales escritas (la contraseña va oculta)" loading="lazy"></a><figcaption>1. Credenciales escritas (la contraseña va oculta)</figcaption></figure><figure><a href="img/tc-a02-usuario-bloqueado-ve-acceso-denegado-2.png" target="_blank" rel="noreferrer"><img src="img/tc-a02-usuario-bloqueado-ve-acceso-denegado-2.png" alt="Cuenta bloqueada: pantalla de acceso denegado" loading="lazy"></a><figcaption>2. Cuenta bloqueada: pantalla de acceso denegado</figcaption></figure></div></td>
+<td class="num">5.9 s</td></tr>
+<tr class="passed"><td><span class="tag passed">Pasa</span></td>
+<td><strong>TC-A04 Contraseña incorrecta muestra error y no entra</strong><br><small>App Android</small><div class="steps"><figure><a href="img/tc-a04-contrasena-incorrecta-muestra-error-y-no-entra-1.png" target="_blank" rel="noreferrer"><img src="img/tc-a04-contrasena-incorrecta-muestra-error-y-no-entra-1.png" alt="Credenciales escritas (la contraseña va oculta)" loading="lazy"></a><figcaption>1. Credenciales escritas (la contraseña va oculta)</figcaption></figure><figure><a href="img/tc-a04-contrasena-incorrecta-muestra-error-y-no-entra-2.png" target="_blank" rel="noreferrer"><img src="img/tc-a04-contrasena-incorrecta-muestra-error-y-no-entra-2.png" alt="Mensaje de error de credenciales" loading="lazy"></a><figcaption>2. Mensaje de error de credenciales</figcaption></figure></div></td>
+<td class="num">6.7 s</td></tr>
+</tbody></table>
+<footer>Generado por Ivan QA Lab. Sin claves, tokens, contraseñas, emails ni ids de usuario.</footer>
+</main></body></html>
