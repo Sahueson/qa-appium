@@ -6,7 +6,9 @@ Pruebas móviles de Tactical Calendar con Appium 2 + WebdriverIO + UiAutomator2,
   `WEBVIEW_com.tacticalcalendar.app` y usa los mismos selectores CSS que la web. El teclado y los permisos van en `NATIVE_APP`.
 - **Chrome móvil (sin APK):** sin `APK_PATH`, abre `BASE_URL` (el staging) en Chrome del emulador.
 
-4 casos (`TC-SMOKE`, `TC-A01`, `TC-A02`, `TC-A04`) con los mismos nombres que en Playwright.
+9 suites (A–I, 62 casos) y la demo de fallos (J, 7 casos que fallan a propósito), con los mismos nombres que en Playwright.
+No se portan: los casos que usan los desplegables propios de la app (TC-G01, TC-G03, TC-H03, TC-H04, TC-E01), la subida de PDF (TC-I01, I02) y las que interceptan red (TC-D05). `tests/helpers.js` trae los localizadores y `loginAs`.
+Los reintentos están desactivados (`RETRIES=1` los activa): en tests que cambian datos esconden el fallo real.
 
 **Estado: verificadas, también en CI.** Se lanzan desde la web: el workflow arranca un emulador Android (KVM), descarga el APK de la
 release `apk-staging`, levanta Appium y ejecuta los casos (~3 min). Para actualizar el APK: `gh release upload apk-staging app-debug.apk --clobber`.
