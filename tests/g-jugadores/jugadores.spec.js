@@ -1,6 +1,5 @@
 // Suite G · Gestión de jugadores (móvil). Solo el super admin cambia rol, bloqueo, equipos y órganos FOE; el efecto se comprueba
 // entrando con el jugador afectado. Cada test toca a un jugador distinto. El reset deja los perfiles como en users.json.
-// Los casos que cambian el rol o el equipo con un desplegable (TC-G01, TC-G03) no se portan: no hay selector estable para el menú propio.
 const h = require("../helpers");
 
 const card = (nick) => h.playerCardXp(nick);
@@ -8,6 +7,39 @@ const hasCard = async (nick) => $(card(nick)).isExisting();
 
 describe("Suite G · Gestión de jugadores (móvil)", () => {
   before(async () => { await h.resetStaging(); });
+
+  it("TC-G01 El super admin asciende a un jugador a admin y este gestiona partidas", async () => {
+    await h.loginAs("superadmin");
+    await h.openTab("Jugadores");
+    await h.chooseOption("Rol de la aplicación", "Admin (Partidas)", card("QA Jugador MAD"));
+    await h.expectToast("Ficha actualizada para QA Jugador MAD.");
+    await step("QA Jugador MAD ascendido a admin");
+    await h.loginAs("player_mad");
+    await h.openTab("Partidas");
+    const ev = h.eventCardXp("QA MAD · Partida próxima");
+    await $(ev).waitForExist({ timeout: 15000 });
+    await expect(h.button("Editar", { within: ev })).toBeExisting();
+    await expect(h.button("Eliminar", { within: ev })).toBeExisting();
+    await step("Como admin ve Editar y Eliminar en las partidas");
+  });
+
+  it("TC-G03 Asignar equipo a un jugador sin equipo le da acceso a ese equipo", async () => {
+    await h.loginAs("superadmin");
+    await h.openTab("Jugadores");
+    const c = card("QA Sin Equipo");
+    await expect(h.textOf("Sin equipo asignado", { within: c })).toBeExisting();
+    await h.chooseOption("Añadir otro equipo", "FOE", c);
+    await h.expectToast("Ficha actualizada para QA Sin Equipo.");
+    await expect($(`${c}//*[@title='Quitar de FOE']`)).toBeExisting();
+    await step("QA Sin Equipo asignado a FOE");
+    await h.loginAs("sinequipo");
+    await expect($("button[aria-label='Navegación principal móvil']")).toBeExisting();
+    expect(await h.navLabels()).toContain("FOE · Votos y Faltas");
+    const titles = await h.visibleEventTitles();
+    expect(titles.some((t) => t.includes("QA FOE · Partida próxima"))).toBe(true);
+    expect(titles.every((t) => !t.includes("QA MAD"))).toBe(true);
+    await step("Ya ve el menú y las partidas de FOE, y ninguna de MAD");
+  });
 
   it("TC-G02 El super admin bloquea a un jugador y este pierde el acceso", async () => {
     await h.loginAs("superadmin");

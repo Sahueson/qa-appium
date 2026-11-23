@@ -1,6 +1,5 @@
 // Suite H · Calendario (móvil): fechas de vacaciones / «No se juega». Las marca un admin para su equipo y solo las ve cada equipo (RLS).
 // Seed: «QA · Sin partida FOE» (días +25 a +26) y «QA · Sin partida MAD» (día +27).
-// Los casos que comprueban las opciones de un desplegable (TC-H03, TC-H04) no se portan: el menú propio no tiene selector estable.
 const h = require("../helpers");
 
 const BLACKOUT_BTN = 'Marcar vacaciones / "No se juega"';
@@ -49,6 +48,24 @@ describe("Suite H · Calendario y fechas sin partida (móvil)", () => {
     await expect($(FORM)).toBeExisting();
     await expect($(blackoutRowXp(reason))).not.toBeExisting();
     await step("Fecha de fin anterior al inicio: no se guarda");
+  });
+
+  it("TC-H03 Un admin de un solo equipo no puede marcar fechas para ambos", async () => {
+    await h.loginAs("admin_mad");
+    await openBlackoutForm();
+    expect(await h.dropdownOptions("Equipo afectado", FORM)).toEqual(["MAD Irregulars"]);
+    await step("«Equipo afectado» solo ofrece MAD Irregulars");
+  });
+
+  it("TC-H04 El super admin puede marcar fechas para ambos equipos", async () => {
+    await h.loginAs("superadmin");
+    await openBlackoutForm();
+    expect(await h.dropdownOptions("Equipo afectado", FORM)).toEqual(["MAD Irregulars", "FOE", "Ambos equipos (MAD Irregulars y FOE)"]);
+    await step("«Equipo afectado» ofrece MAD, FOE y ambos");
+    // Y ve las fechas de los dos equipos.
+    await expect($(blackoutBtnXp("QA · Sin partida FOE"))).toBeExisting();
+    await expect($(blackoutBtnXp("QA · Sin partida MAD"))).toBeExisting();
+    await step("Ve las fechas de los dos equipos");
   });
 
   it("TC-H05 Cada equipo solo ve sus fechas y un jugador no puede quitarlas", async () => {

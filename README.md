@@ -6,8 +6,8 @@ Pruebas móviles de Tactical Calendar con Appium 2 + WebdriverIO + UiAutomator2,
   `WEBVIEW_com.tacticalcalendar.app` y usa los mismos selectores CSS que la web. El teclado y los permisos van en `NATIVE_APP`.
 - **Chrome móvil (sin APK):** sin `APK_PATH`, abre `BASE_URL` (el staging) en Chrome del emulador.
 
-9 suites (A–I, 62 casos) y la demo de fallos (J, 7 casos que fallan a propósito), con los mismos nombres que en Playwright.
-No se portan: los casos que usan los desplegables propios de la app (TC-G01, TC-G03, TC-H03, TC-H04, TC-E01), la subida de PDF (TC-I01, I02) y las que interceptan red (TC-D05). `tests/helpers.js` trae los localizadores y `loginAs`.
+9 suites (A–I, 67 casos) y la demo de fallos (J, 7 casos que fallan a propósito), con los mismos nombres que en Playwright.
+No se portan: la subida de PDF (TC-I01, I02, y los pasos de I04/I05 que la usaban; el selector de ficheros del sistema no se maneja desde la WebView) y las que interceptan red (TC-D05). Los desplegables propios (`TacticalSelect`) sí: `chooseOption` y `dropdownOptions` los abren por su `aria-label`. `tests/helpers.js` trae los localizadores y `loginAs`.
 Los reintentos están desactivados (`RETRIES=1` los activa): en tests que cambian datos esconden el fallo real.
 
 **Estado: verificadas, también en CI.** Se lanzan desde la web: el workflow arranca un emulador Android (KVM), descarga el APK de la

@@ -158,6 +158,16 @@ async function chooseOption(ariaLabel, optionText, within = "") {
   await tap($(`//ul[@role='listbox']//li[@role='option']//button[contains(${norm}, ${xq(optionText)})]`));
 }
 
+// Opciones de un desplegable propio: lo abre, lee los textos de la lista y lo cierra (las opciones solo existen con el menú abierto).
+async function dropdownOptions(ariaLabel, within = "") {
+  const trigger = $(`${within}//button[contains(@class,'tactical-dropdown__trigger')][@aria-label=${xq(ariaLabel)}]`);
+  await tap(trigger);
+  await $("//ul[@role='listbox']//li[@role='option']").waitForExist({ timeout: 10000 });
+  const labels = await browser.execute(() => [...document.querySelectorAll("ul[role='listbox'] li[role='option']")].map((li) => li.textContent.trim()));
+  await trigger.click(); // cierra el menú sin elegir nada
+  return labels;
+}
+
 // Rellena un input controlado por React (fecha, hora o texto) poniendo el valor y avisando con los eventos que la app escucha.
 // Los <input type="date"> no aceptan teclear en una WebView: se les pone el valor directamente.
 async function fillInput(el, value) {
@@ -187,5 +197,5 @@ const futureDate = (days) => {
 
 module.exports = {
   USERS, qaUser, resetStaging, xq, button, buttonStarts, heading, textOf, navTab, eventCard, eventCardXp, modal, MODAL, playerCardXp, pollCardXp,
-  settle, open, logout, loginAs, openTab, navLabels, openEvent, visibleEventTitles, tap, expectToast, exists, visible, chooseOption, fillInput, checkLabel, futureDate,
+  settle, open, logout, loginAs, openTab, navLabels, openEvent, visibleEventTitles, tap, expectToast, exists, visible, chooseOption, dropdownOptions, fillInput, checkLabel, futureDate,
 };

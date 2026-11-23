@@ -13,6 +13,26 @@ const poll = (title) => h.pollCardXp(title);
 describe("Suite E · Gobernanza FOE (móvil)", () => {
   before(async () => { await h.resetStaging(); });
 
+  it("TC-E01 La Junta Directiva abre un expediente sancionador", async () => {
+    await h.loginAs("admin_foe");
+    await openFoeSection("Votos · Junta Directiva");
+    await h.tap(h.button("+ Nueva votación"));
+    const FORM = "//form[.//*[contains(normalize-space(.), 'Convocar votación en Junta Directiva')]]";
+    await $(FORM).waitForExist({ timeout: 15000 });
+    await h.chooseOption("Tema de la votación", "Votación de sanción a operador", FORM);
+    await h.chooseOption("Miembro sancionado", "QA Jugador FOE", FORM);
+    await h.chooseOption("Gravedad de la falta", "Falta Grave", FORM);
+    await h.fillInput($(`${FORM}//*[contains(@placeholder, 'Art. 51.i')]`), "Art. 36.2 — Baja < 48h");
+    await h.fillInput($(`${FORM}//*[contains(@placeholder, 'Explica los hechos')]`), "Baja sin aviso en la partida del domingo (E2E).");
+    await step("Formulario de sanción rellenado");
+    await h.tap(h.button("Publicar votación", { within: FORM }));
+    const card = poll("Propuesta de Falta Grave a QA Jugador FOE");
+    await $(card).waitForExist({ timeout: 15000 });
+    await expect(h.textOf("Art. 36.2 — Baja < 48h", { within: card })).toBeExisting();
+    await expect(h.button(FAVOR, { exact: false, within: card })).toBeEnabled();
+    await step("Expediente publicado con voto «A favor de sancionar» disponible");
+  });
+
   it("TC-E02 El propuesto para sanción queda recusado y no puede votar", async () => {
     await h.loginAs("junta2");
     await openFoeSection("Votos · Junta Directiva");
