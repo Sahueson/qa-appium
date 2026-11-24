@@ -152,15 +152,15 @@ async function expectToast(text) {
 const exists = async (el) => el.isExisting();
 const visible = async (el) => (await el.isExisting()) && (await el.isDisplayed());
 
-// Desplegable propio (TacticalSelect): se abre por su aria-label y se elige la opción por su texto.
+// Desplegable propio (TacticalSelect): se abre por su aria-label (por prefijo: en las fichas termina con el nombre del jugador, p. ej. «Rol de la aplicación de QA Jugador MAD») y se elige la opción por su texto.
 async function chooseOption(ariaLabel, optionText, within = "") {
-  await tap($(`${within}//button[contains(@class,'tactical-dropdown__trigger')][@aria-label=${xq(ariaLabel)}]`));
+  await tap($(`${within}//button[contains(@class,'tactical-dropdown__trigger')][starts-with(@aria-label, ${xq(ariaLabel)})]`));
   await tap($(`//ul[@role='listbox']//li[@role='option']//button[contains(${norm}, ${xq(optionText)})]`));
 }
 
 // Opciones de un desplegable propio: lo abre, lee los textos de la lista y lo cierra (las opciones solo existen con el menú abierto).
 async function dropdownOptions(ariaLabel, within = "") {
-  const trigger = $(`${within}//button[contains(@class,'tactical-dropdown__trigger')][@aria-label=${xq(ariaLabel)}]`);
+  const trigger = $(`${within}//button[contains(@class,'tactical-dropdown__trigger')][starts-with(@aria-label, ${xq(ariaLabel)})]`);
   await tap(trigger);
   await $("//ul[@role='listbox']//li[@role='option']").waitForExist({ timeout: 10000 });
   const labels = await browser.execute(() => [...document.querySelectorAll("ul[role='listbox'] li[role='option']")].map((li) => li.textContent.trim()));
