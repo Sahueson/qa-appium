@@ -3,6 +3,9 @@
 //   (sin APK_PATH)                 -> Chrome móvil contra BASE_URL (la web, sin app)
 // Servicio de Appium arrancado aparte (`npx appium`); en CI lo prepara el workflow (ci-run.sh).
 const fs = require("fs");
+const path = require("path");
+// Eventos para la pantalla en vivo de la web (no hacen nada sin RUN_ID).
+const live = require("./shared/live-events.js");
 const LINES = "result.tests.ndjson"; // los workers de WebdriverIO son otro proceso: cada test se guarda en un fichero
 const META = "result.meta.json";
 const APK = process.env.APK_PATH;
@@ -19,6 +22,21 @@ const device = {
 const capability = APK
   ? { ...device, "appium:app": APK, "appium:appPackage": PKG, "appium:appActivity": `${PKG}.MainActivity`, "appium:autoWebview": true, "appium:chromedriverAutodownload": true, "appium:autoGrantPermissions": true, "appium:enforceAppInstall": true }
   : { ...device, browserName: "chrome", "appium:chromedriverAutodownload": true };
+
+// Nº de tests que se van a ejecutar (it("...") de las suites pedidas que pasan el filtro GREP): barra de progreso de la web.
+function countTests() {
+  const grep = process.env.GREP ? new RegExp(process.env.GREP) : null;
+  const files = (dir) => !fs.existsSync(dir) ? [] : fs.readdirSync(dir, { withFileTypes: true })
+    .flatMap((e) => e.isDirectory() ? files(path.join(dir, e.name)) : e.name.endsWith(".js") ? [path.join(dir, e.name)] : []);
+  const itTitle = /^\s*it\(\s*(["'])(.+?)\1/gm;
+  let total = 0;
+  for (const suite of (process.env.SUITE || "a-auth").split(",").filter(Boolean)) {
+    for (const f of files(path.join("tests", suite))) {
+      for (const m of fs.readFileSync(f, "utf8").matchAll(itTitle)) if (!grep || grep.test(m[2])) total++;
+    }
+  }
+  return total;
+}
 
 let current = null; // test en curso: { dir, steps: [{ title, path }] }
 
@@ -80,6 +98,7 @@ exports.config = {
     fs.rmSync(dir, { recursive: true, force: true });
     fs.mkdirSync(dir, { recursive: true });
     current = { dir, steps: [] };
+    live.emit("test_started", test.title);
   },
 
   // Cada test se anota para result.json (formato común del lab)
@@ -93,8 +112,14 @@ exports.config = {
       error: error ? String(error.message).slice(0, 500) : null, evidence_url: null, evidence_path: last, steps,
     }) + "\n");
     current = null;
+    live.emit(passed ? "test_passed" : "test_failed", test.title);
+    if (!passed && error) live.emit("log", `   ↳ ${String(error.message).split("\n")[0]}`);
+    await live.flush(); // el worker puede terminar justo después del último test
   },
-  onPrepare: () => { fs.rmSync(LINES, { force: true }); fs.rmSync(META, { force: true }); },
+  onPrepare: () => {
+    fs.rmSync(LINES, { force: true }); fs.rmSync(META, { force: true });
+    live.emit("plan", String(countTests()));
+  },
   onComplete: () => {
     const lines = fs.existsSync(LINES) ? fs.readFileSync(LINES, "utf8").trim().split("\n").filter(Boolean).map((l) => JSON.parse(l)) : [];
     // Con reintentos un test puede aparecer dos veces: vale el último intento.
